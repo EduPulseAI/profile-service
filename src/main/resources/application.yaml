@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: profile-service
+  datasource:
+    password: ${DATABASE_PASSWORD:password}
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:profile_service}
+    username: ${DATABASE_USER:default}
+  profiles:
+    active: dev
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+app:
+  open-api:
+    description: @project.description@
+    title: @project.name@
+    version: @project.version@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    liveness-state:
+      enabled: true
+    readiness-state:
+      enabled: true
+jwt:
+  secret: ${JWT_SECRET}
+  issuer: ${spring.application.name}
+  security:
+    public-paths: /swagger-ui/**, /v3/api-docs/**, /actuator/health/**, /error/**, /api/auth/**, /api/users/student
