@@ -1,9 +1,6 @@
 package xyz.catuns.edupulse.profile.domain.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.catuns.spring.jwt.domain.entity.RoleEntity;
@@ -18,10 +15,11 @@ import java.util.Collections;
 @Table(name = "users")
 public class User extends UserEntity {
 
-    @OneToOne(cascade = {CascadeType.ALL})
+    @OneToOne(cascade = CascadeType.ALL)
     private Profile profile;
 
-    @OneToOne(cascade = {CascadeType.ALL})
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
     @Override

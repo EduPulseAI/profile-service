@@ -18,16 +18,15 @@ import xyz.catuns.edupulse.profile.service.UserService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "User api")
+@Tag(name = "User API")
 public class UserController {
 
     private final UserService userService;
 
-
     @PostMapping(value = "/student")
     @Operation(
             summary = "Create Student",
-            description = "REST API Post to CreateStudent")
+            description = "Register a new student user")
     @ApiResponse(
             responseCode = "201",
             description = "HTTP Status CREATED")
