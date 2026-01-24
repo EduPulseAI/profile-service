@@ -2,6 +2,7 @@ package xyz.catuns.edupulse.profile.domain.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import xyz.catuns.edupulse.profile.domain.dto.profile.*;
 import xyz.catuns.edupulse.profile.domain.entity.Profile;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.*;
@@ -22,6 +23,11 @@ public interface ProfileMapper {
     ProfileResponse toResponse(Profile profile);
 
     PersonalDto toPersonalDto(Personal personal);
+
+    @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "badges", ignore = true)
+    @Mapping(target = "social", ignore = true)
+    void updatePersonalFromRequest(UpdatePersonalRequest request, @MappingTarget Personal personal);
 
     SocialLinkDto toSocialLinkDto(SocialLink socialLink);
 
