@@ -3,7 +3,19 @@ package xyz.catuns.edupulse.profile.domain.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import xyz.catuns.edupulse.profile.domain.dto.profile.*;
+import xyz.catuns.edupulse.profile.domain.dto.profile.AboutDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.CertificationDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.CredentialsDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.EducationDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.EducationRequest;
+import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceItemDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceRequest;
+import xyz.catuns.edupulse.profile.domain.dto.profile.LanguageDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.PersonalDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
+import xyz.catuns.edupulse.profile.domain.dto.profile.SocialLinkDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.TechnicalSkillsDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.UpdatePersonalRequest;
 import xyz.catuns.edupulse.profile.domain.entity.Profile;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.*;
 
@@ -52,4 +64,14 @@ public interface ProfileMapper {
     List<EducationDto> toEducationDtoList(List<Education> educations);
 
     TechnicalSkillsDto toTechnicalSkillsDto(TechnicalSkills technicalSkills);
+
+    // Experience mapping
+    Experience toExperience(ExperienceRequest request);
+
+    void updateExperienceFromRequest(ExperienceRequest request, @MappingTarget Experience experience);
+
+    // Education mapping
+    Education toEducation(EducationRequest request);
+
+    void updateEducationFromRequest(EducationRequest request, @MappingTarget Education education);
 }

@@ -3,7 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:${DATABASE_PORT:5432}/${DATABASE_NAME:profile_service}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     defer-datasource-initialization: true
   sql:
     init:

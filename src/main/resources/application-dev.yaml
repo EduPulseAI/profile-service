@@ -20,6 +20,7 @@ management:
 logging:
   level:
     root: info
+    org.springframework.security: trace
     xyz:
       catuns:
         edupulse:
