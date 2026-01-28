@@ -37,3 +37,4 @@ jwt:
   issuer: ${spring.application.name}
   security:
     public-paths: /swagger-ui/**, /v3/api-docs/**, /actuator/health/**, /error/**, /api/auth/**, /api/users/student
+  expiration: 1d
