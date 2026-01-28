@@ -11,4 +11,13 @@ import xyz.catuns.spring.jwt.domain.entity.TokenEntity;
 @Entity
 @Table(name = "refresh_tokens")
 public class RefreshToken extends TokenEntity {
+
+    public RefreshToken() {
+    }
+
+    public RefreshToken(String identifier) {
+        this.identifier = identifier;
+    }
+
+
 }

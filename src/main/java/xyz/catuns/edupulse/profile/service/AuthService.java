@@ -1,8 +1,11 @@
 package xyz.catuns.edupulse.profile.service;
 
 import xyz.catuns.edupulse.profile.domain.dto.LoginRequest;
-import xyz.catuns.edupulse.profile.domain.dto.LoginResponse;
+import xyz.catuns.edupulse.profile.domain.dto.AuthResponse;
+import xyz.catuns.edupulse.profile.domain.dto.RefreshTokenRequest;
 
 public interface AuthService {
-    LoginResponse login(LoginRequest request);
+    AuthResponse login(LoginRequest request);
+
+    AuthResponse refreshToken(RefreshTokenRequest request);
 }

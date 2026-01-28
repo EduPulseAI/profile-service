@@ -3,23 +3,31 @@ package xyz.catuns.edupulse.profile.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.catuns.edupulse.profile.domain.dto.LoginRequest;
-import xyz.catuns.edupulse.profile.domain.dto.LoginResponse;
+import xyz.catuns.edupulse.profile.domain.dto.AuthResponse;
+import xyz.catuns.edupulse.profile.domain.dto.RefreshTokenRequest;
+import xyz.catuns.edupulse.profile.domain.entity.RefreshToken;
 import xyz.catuns.edupulse.profile.domain.entity.User;
 import xyz.catuns.edupulse.profile.domain.mapper.UserMapper;
+import xyz.catuns.edupulse.profile.domain.repository.RefreshTokenRepository;
 import xyz.catuns.edupulse.profile.domain.repository.UserRepository;
 import xyz.catuns.edupulse.profile.service.AuthService;
-import xyz.catuns.spring.base.exception.controller.BadRequestException;
-import xyz.catuns.spring.jwt.auth.AuthTokenProvider;
+import xyz.catuns.spring.base.exception.controller.NotFoundException;
+import xyz.catuns.spring.jwt.core.exception.TokenValidationException;
 import xyz.catuns.spring.jwt.core.model.JwtToken;
-import xyz.catuns.spring.jwt.security.properties.JwtSecurityProperties;
+import xyz.catuns.spring.jwt.core.provider.TokenProvider;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class AuthServiceImpl implements AuthService {
 
     /* mappers */
@@ -27,20 +35,75 @@ public class AuthServiceImpl implements AuthService {
 
     /* providers */
     private final AuthenticationProvider provider;
-    private final AuthTokenProvider authTokenProvider;
+    private final TokenProvider<Authentication> authTokenProvider;
+    private final TokenProvider<RefreshToken> refreshTokenProvider;
 
+    private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
 
     @Override
-    public LoginResponse login(LoginRequest request) {
-        Authentication auth = this.authenticate(request);
+    public AuthResponse login(LoginRequest request) {
+        Authentication auth = authenticate(request);
         JwtToken token = authTokenProvider.generate(auth);
+
+        // Generate refresh token
         User user = (User) auth.getPrincipal();
-        return new LoginResponse(
-                token,
-                userMapper.toResponse(user)
+        RefreshToken refreshToken = buildRefreshToken(user);
+
+        // remove expired refresh tokens
+        refreshTokenRepository.deleteAllByIdentifierAndExpiresBefore(
+                user.getUsername(),
+                Instant.now()
         );
+
+        return new AuthResponse(
+                token,
+                userMapper.toResponse(user),
+                refreshToken.getToken()
+        );
+    }
+
+    @Override
+
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        RefreshToken validatedToken = refreshTokenRepository.findByToken(request.refreshToken())
+                .orElseThrow(() -> new NotFoundException("No refresh token found"));
+        if(validatedToken.isExpired()) {
+            throw new TokenValidationException("refresh token is expired");
+        }
+
+        // build user jwt token
+        User user = userRepository.findByEmail(validatedToken.getIdentifier())
+                .orElseThrow(() -> new BadCredentialsException("User not found by token identifier"));
+        Authentication auth = UsernamePasswordAuthenticationToken
+                .authenticated(user, user.getPassword(), user.getAuthorities());
+        JwtToken token = authTokenProvider.generate(auth);
+
+        // revalidate refreshToken
+        if (refreshTokenRepository.existsByToken(request.refreshToken())) {
+            log.info("Refresh token already exists");
+            refreshTokenRepository.deleteByToken(request.refreshToken());
+        }
+        validatedToken = buildRefreshToken(user);
+        return new AuthResponse(
+                token,
+                userMapper.toResponse(user),
+                validatedToken.getToken()
+        );
+    }
+
+    private RefreshToken buildRefreshToken(User principal) {
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setIdentifier(principal.getUsername());
+
+        JwtToken jwtToken = refreshTokenProvider.generate(refreshToken);
+        refreshToken.setToken(jwtToken.value());
+        refreshToken.setExpires(jwtToken.expiration());
+        refreshToken.setIssuedAt(jwtToken.issuedAt());
+
+        return refreshTokenRepository.save(refreshToken);
     }
 
     private Authentication authenticate(LoginRequest request) {

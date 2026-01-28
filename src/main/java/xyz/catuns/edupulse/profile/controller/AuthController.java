@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.catuns.edupulse.profile.domain.dto.LoginRequest;
-import xyz.catuns.edupulse.profile.domain.dto.LoginResponse;
+import xyz.catuns.edupulse.profile.domain.dto.AuthResponse;
+import xyz.catuns.edupulse.profile.domain.dto.RefreshTokenRequest;
 import xyz.catuns.edupulse.profile.service.AuthService;
 
 @RequiredArgsConstructor
@@ -31,10 +32,23 @@ public class AuthController {
     @ApiResponse(
             responseCode = "200",
             description = "HTTP Status OK")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        LoginResponse response = authService.login(request);
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @PostMapping(value = "/refresh")
+    @Operation(
+            summary = "Refresh Token",
+            description = "Creates new token with refresh token")
+    @ApiResponse(responseCode = "200",description = "HTTP Status OK")
+    public ResponseEntity<AuthResponse> refreshToken(
+            @RequestBody RefreshTokenRequest request
+    ){
+        AuthResponse response = authService.refreshToken(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
