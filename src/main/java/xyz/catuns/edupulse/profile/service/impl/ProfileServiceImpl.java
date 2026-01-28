@@ -3,15 +3,18 @@ package xyz.catuns.edupulse.profile.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.catuns.edupulse.profile.domain.dto.profile.AboutDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.EducationDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.EducationRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceItemDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.PersonalDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
+import xyz.catuns.edupulse.profile.domain.dto.profile.UpdateAboutRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.UpdatePersonalRequest;
 import xyz.catuns.edupulse.profile.domain.entity.Profile;
 import xyz.catuns.edupulse.profile.domain.entity.User;
+import xyz.catuns.edupulse.profile.domain.entity.embeddable.About;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.Credentials;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.Education;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.Experience;
@@ -65,6 +68,45 @@ public class ProfileServiceImpl implements ProfileService {
         profileMapper.updatePersonalFromRequest(request, personal);
 
         return profileMapper.toPersonalDto(personal);
+    }
+
+    @Override
+    @Transactional
+    public AboutDto updateAbout(String username, UpdateAboutRequest request) {
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new NotFoundException("User not found: " + username));
+
+        Profile profile = user.getProfile();
+        if (profile == null) {
+            throw new NotFoundException("Profile not found for user: " + username);
+        }
+
+        About about = profile.getAbout();
+        if (about == null) {
+            about = new About();
+            profile.setAbout(about);
+        }
+
+        // Update simple fields
+        about.setBio(request.bio());
+
+        // Update lists - clear and repopulate
+        about.getFocus().clear();
+        if (request.focus() != null) {
+            about.getFocus().addAll(request.focus());
+        }
+
+        about.getInterests().clear();
+        if (request.interests() != null) {
+            about.getInterests().addAll(request.interests());
+        }
+
+        about.getLanguages().clear();
+        if (request.languages() != null) {
+            about.getLanguages().addAll(profileMapper.toLanguageList(request.languages()));
+        }
+
+        return profileMapper.toAboutDto(about);
     }
 
     // Experience CRUD operations

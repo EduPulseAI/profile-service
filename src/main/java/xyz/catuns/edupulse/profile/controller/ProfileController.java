@@ -9,12 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import xyz.catuns.edupulse.profile.domain.dto.profile.AboutDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.EducationDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.EducationRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceItemDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.PersonalDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
+import xyz.catuns.edupulse.profile.domain.dto.profile.UpdateAboutRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.UpdatePersonalRequest;
 import xyz.catuns.edupulse.profile.service.ProfileService;
 
@@ -56,6 +58,23 @@ public class ProfileController {
     ) {
         PersonalDto updatedPersonal = profileService.updatePersonalInfo(username, request);
         return ResponseEntity.ok(updatedPersonal);
+    }
+
+    @PutMapping("/about")
+    @Operation(
+            summary = "Update About Information",
+            description = "Update the about section (bio, focus areas, interests, languages) of the currently authenticated user's profile")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponse(responseCode = "200", description = "About information updated successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid request data")
+    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    @ApiResponse(responseCode = "404", description = "Profile not found")
+    public ResponseEntity<AboutDto> updateAbout(
+            @AuthenticationPrincipal String username,
+            @Valid @RequestBody UpdateAboutRequest request
+    ) {
+        AboutDto updatedAbout = profileService.updateAbout(username, request);
+        return ResponseEntity.ok(updatedAbout);
     }
 
 

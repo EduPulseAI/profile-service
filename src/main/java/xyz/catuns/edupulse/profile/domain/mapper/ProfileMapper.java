@@ -15,6 +15,7 @@ import xyz.catuns.edupulse.profile.domain.dto.profile.PersonalDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
 import xyz.catuns.edupulse.profile.domain.dto.profile.SocialLinkDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.TechnicalSkillsDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.UpdateAboutRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.UpdatePersonalRequest;
 import xyz.catuns.edupulse.profile.domain.entity.Profile;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.*;
@@ -48,6 +49,13 @@ public interface ProfileMapper {
     LanguageDto toLanguageDto(Language language);
 
     List<LanguageDto> toLanguageDtoList(List<Language> languages);
+
+    // About mapping
+    Language toLanguage(UpdateAboutRequest.LanguageRequest request);
+
+    List<Language> toLanguageList(List<UpdateAboutRequest.LanguageRequest> requests);
+
+    void updateAboutFromRequest(UpdateAboutRequest request, @MappingTarget About about);
 
     ExperienceItemDto toExperienceItemDto(Experience experience);
 
