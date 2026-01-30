@@ -41,7 +41,6 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
-
     @Override
     public AuthResponse login(LoginRequest request) {
         Authentication auth = authenticate(request);
@@ -65,11 +64,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         RefreshToken validatedToken = refreshTokenRepository.findByToken(request.refreshToken())
                 .orElseThrow(() -> new NotFoundException("No refresh token found"));
         if(validatedToken.isExpired()) {
+            refreshTokenRepository.delete(validatedToken);
             throw new TokenValidationException("refresh token is expired");
         }
 
@@ -80,12 +79,6 @@ public class AuthServiceImpl implements AuthService {
                 .authenticated(user, user.getPassword(), user.getAuthorities());
         JwtToken token = authTokenProvider.generate(auth);
 
-        // revalidate refreshToken
-        if (refreshTokenRepository.existsByToken(request.refreshToken())) {
-            log.info("Refresh token already exists");
-            refreshTokenRepository.deleteByToken(request.refreshToken());
-        }
-        validatedToken = buildRefreshToken(user);
         return new AuthResponse(
                 token,
                 userMapper.toResponse(user),
