@@ -7,26 +7,11 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record UpdateAboutRequest(
-        @NotBlank(message = "Bio is required")
-        @Size(max = 2000, message = "Bio must be less than 2000 characters")
-        String bio,
-
-        List<String> focus,
-
-        List<String> interests,
+//        @NotBlank(message = "Bio is required")
+//        @Size(max = 2000, message = "Bio must be less than 2000 characters")
+//        String bio,
 
         @Valid
-        List<LanguageRequest> languages
+        List<String> summary
 ) {
-    public record LanguageRequest(
-            @NotBlank(message = "Language name is required")
-            String name,
-
-            @NotBlank(message = "Proficiency is required")
-            String proficiency,
-
-            int level,
-
-            String flag
-    ) {}
 }

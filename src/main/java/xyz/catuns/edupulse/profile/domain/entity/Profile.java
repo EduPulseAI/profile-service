@@ -20,6 +20,12 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
+
+    @Column(name = "is_primary")
+    private Boolean isPrimary;
+
     // Personal information
     @Embedded
     private Personal personal;

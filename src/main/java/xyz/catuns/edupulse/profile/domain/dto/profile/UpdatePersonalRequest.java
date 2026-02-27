@@ -25,10 +25,7 @@ public record UpdatePersonalRequest(
         @Size(min = 3, message = "Location must contain at least 3 characters")
         String location,
 
-        String phone,
+        String phone
 
-        String workingHours,
-
-        boolean availableForWork
 ) {
 }

@@ -14,6 +14,8 @@ public record ExperienceRequest(
         @NotBlank(message = "Period is required")
         String period,
 
+        String location,
+
         String description,
 
         List<String> achievements,

@@ -10,8 +10,6 @@ public record EducationRequest(
         String institution,
 
         @NotBlank(message = "Year is required")
-        String year,
-
-        String logo
+        String year
 ) {
 }

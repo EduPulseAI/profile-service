@@ -24,12 +24,15 @@ public class Experience {
     @Column(name = "exp_period")
     private String period;
 
+    @Column(name = "exp_location")
+    private String location;
+
     @Column(name = "exp_description", length = 2000)
     private String description;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "exp_achievements", columnDefinition = "jsonb")
-    private List<String> achievements = new ArrayList<>();
+    @Column(name = "exp_responsibilities", columnDefinition = "jsonb")
+    private List<String> responsibilities = new ArrayList<>();
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "exp_technologies", columnDefinition = "jsonb")

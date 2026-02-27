@@ -19,6 +19,4 @@ public class Education {
     @Column(name = "edu_year")
     private String year;
 
-    @Column(name = "edu_logo")
-    private String logo;
 }

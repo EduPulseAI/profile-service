@@ -1,8 +1,6 @@
 package xyz.catuns.edupulse.profile.domain.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import xyz.catuns.edupulse.profile.domain.dto.profile.AboutDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.CertificationDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.CredentialsDto;
@@ -37,25 +35,12 @@ public interface ProfileMapper {
 
     PersonalDto toPersonalDto(Personal personal);
 
-    @Mapping(target = "avatar", ignore = true)
-    @Mapping(target = "badges", ignore = true)
-    @Mapping(target = "social", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updatePersonalFromRequest(UpdatePersonalRequest request, @MappingTarget Personal personal);
-
-    SocialLinkDto toSocialLinkDto(SocialLink socialLink);
 
     AboutDto toAboutDto(About about);
 
-    LanguageDto toLanguageDto(Language language);
-
-    List<LanguageDto> toLanguageDtoList(List<Language> languages);
-
     // About mapping
-    Language toLanguage(UpdateAboutRequest.LanguageRequest request);
-
-    List<Language> toLanguageList(List<UpdateAboutRequest.LanguageRequest> requests);
-
-    void updateAboutFromRequest(UpdateAboutRequest request, @MappingTarget About about);
 
     ExperienceItemDto toExperienceItemDto(Experience experience);
 
@@ -76,10 +61,14 @@ public interface ProfileMapper {
     // Experience mapping
     Experience toExperience(ExperienceRequest request);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateExperienceFromRequest(ExperienceRequest request, @MappingTarget Experience experience);
 
     // Education mapping
     Education toEducation(EducationRequest request);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEducationFromRequest(EducationRequest request, @MappingTarget Education education);
+
+    Profile toEntity(ProfileResponse resume);
 }

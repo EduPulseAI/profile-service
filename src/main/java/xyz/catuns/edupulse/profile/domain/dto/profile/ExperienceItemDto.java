@@ -5,9 +5,10 @@ import java.util.List;
 public record ExperienceItemDto(
         String title,
         String company,
+        String location,
         String period,
         String description,
-        List<String> achievements,
+        List<String> responsibilities,
         List<String> technologies
 ) {
 }

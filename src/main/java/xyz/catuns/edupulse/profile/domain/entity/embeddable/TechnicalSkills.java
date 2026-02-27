@@ -13,22 +13,38 @@ import java.util.List;
 public class TechnicalSkills {
 
     @ElementCollection
-    @CollectionTable(name = "profile_design_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @CollectionTable(name = "profile_languages", joinColumns = @JoinColumn(name = "profile_id"))
     @Column(name = "skill")
-    private List<String> design = new ArrayList<>();
+    private List<String> languages = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "profile_development_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @CollectionTable(name = "profile_backend_skills", joinColumns = @JoinColumn(name = "profile_id"))
     @Column(name = "skill")
-    private List<String> development = new ArrayList<>();
+    private List<String> backend = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "profile_ux_methods", joinColumns = @JoinColumn(name = "profile_id"))
-    @Column(name = "method")
-    private List<String> uxMethods = new ArrayList<>();
+    @CollectionTable(name = "profile_frontend_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @Column(name = "skill")
+    private List<String> frontend = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "profile_soft_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @CollectionTable(name = "profile_database_skills", joinColumns = @JoinColumn(name = "profile_id"))
     @Column(name = "skill")
-    private List<String> softSkills = new ArrayList<>();
+    private List<String> database = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "profile_cloud_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @Column(name = "skill")
+    private List<String> cloud = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "profile_tools_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @Column(name = "skill")
+    private List<String> tools = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "profile_methodologies_skills", joinColumns = @JoinColumn(name = "profile_id"))
+    @Column(name = "skill")
+    private List<String> methodologies = new ArrayList<>();
+
 }
