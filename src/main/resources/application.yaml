@@ -11,7 +11,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        show_sql: false
+        show_sql: true
+  ai:
+    vertex.ai:
+      gemini:
+        chat:
+          options:
+            model: ${GEMINI_MODEL:gemini-2.5-flash}
+        project-id: ${GCP_PROJECT_ID:edupulse-483220}
+        location: ${GCP_REGION:us-central1}
+        credentials-uri: ${VERTEX_AI_CREDENTIALS_URI:}
 app:
   open-api:
     description: @project.description@
@@ -36,5 +45,4 @@ jwt:
   secret: ${JWT_SECRET}
   issuer: ${spring.application.name}
   security:
-    public-paths: /swagger-ui/**, /v3/api-docs/**, /actuator/health/**, /error/**, /api/auth/**, /api/users/student
-  expiration: 1d
+    public-paths: /swagger-ui/**, /v3/api-docs/**, /actuator/health/**, /error/**
