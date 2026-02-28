@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
+import xyz.catuns.edupulse.profile.domain.dto.UploadResumeResponse;
 import xyz.catuns.edupulse.profile.service.ResumeService;
 
 @RequiredArgsConstructor
@@ -27,11 +27,11 @@ public class ResumeController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "UploadResume",description = "Upload Resume")
     @ApiResponse(responseCode = "202", description = "HTTP Status ACCEPTED")
-    public ResponseEntity<ProfileResponse> uploadResume(
+    public ResponseEntity<UploadResumeResponse> uploadResume(
             @RequestPart("file") MultipartFile file,
             @AuthenticationPrincipal String username
     ) {
-        ProfileResponse response = resumeService.uploadResume(file, username);
+        UploadResumeResponse response = resumeService.uploadResume(file, username);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 }
