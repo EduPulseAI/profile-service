@@ -21,16 +21,26 @@ spring:
         chat:
           options:
             model: ${GEMINI_MODEL:gemini-2.5-flash}
-        project-id: ${GCP_PROJECT_ID:edupulse-483220}
+        project-id: ${GCP_PROJECT_ID:}
         location: ${GCP_REGION:us-central1}
         credentials-uri: ${VERTEX_AI_CREDENTIALS_URI:}
       embedding:
-        project-id: ${GCP_PROJECT_ID:edupulse-483220}
+        project-id: ${GCP_PROJECT_ID:}
         location: ${GCP_REGION:us-central1}
         credentials-uri: ${VERTEX_AI_CREDENTIALS_URI:}
         text:
           options:
             model: text-embedding-004
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: ${EUREKA_PROTOCOL:http}://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+    fetch-registry: true
+    register-with-eureka: true
 app:
   open-api:
     description: @project.description@
