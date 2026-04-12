@@ -1,7 +1,7 @@
 package xyz.catuns.edupulse.profile.service.impl;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
@@ -13,13 +13,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import xyz.catuns.edupulse.profile.domain.dto.UploadResumeResponse;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
+import xyz.catuns.edupulse.profile.domain.entity.Resume;
 import xyz.catuns.edupulse.profile.domain.mapper.ProfileMapper;
 import xyz.catuns.edupulse.profile.domain.repository.ProfileRepository;
+import xyz.catuns.edupulse.profile.domain.repository.ResumeRepository;
 import xyz.catuns.edupulse.profile.service.ResumeService;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class ResumeServiceImpl implements ResumeService {
     private final VectorStore vectorStore;
     private final ProfileMapper profileMapper;
     private final ProfileRepository profileRepository;
+    private final ResumeRepository resumeRepository;
 
     @Value("classpath:prompts/resume.st")
     private Resource resumePromptResource;
@@ -55,11 +59,28 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
+    @Transactional
     public UploadResumeResponse uploadResume(MultipartFile file, String username) {
+        // generate unique id
+        Resume resume = Resume.builder()
+                .username(username)
+                .originalFileName(file.getOriginalFilename())
+                .build();
+        resume = resumeRepository.save(resume);
+
+        // split document
         TikaDocumentReader documentReader = new TikaDocumentReader(file.getResource());
         TextSplitter textSplitter = new TokenTextSplitter();
         List<Document> documents = documentReader.get();
+
+        // set metadata
+        for (Document document : documents) {
+            var metadata = document.getMetadata();
+            metadata.put("resumeId", resume.getId().toString());
+        }
+
         vectorStore.accept(textSplitter.apply(documents));
-        return new UploadResumeResponse(username, file.getOriginalFilename());
+        log.info("Uploaded docs {}", documents);
+        return new UploadResumeResponse(resume, documents);
     }
 }

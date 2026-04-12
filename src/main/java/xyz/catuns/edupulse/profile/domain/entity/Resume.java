@@ -1,16 +1,21 @@
 package xyz.catuns.edupulse.profile.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "resumes")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "resumes", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uc_username_original_file_name",
+                columnNames = {"username", "original_file_name"})
+})
 public class Resume {
 
     @Id

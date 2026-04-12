@@ -1,7 +1,7 @@
 package xyz.catuns.edupulse.profile.domain.dto;
 
 public record UploadResumeResponse(
-        String username,
-        String filename
+        xyz.catuns.edupulse.profile.domain.entity.Resume username,
+        java.util.List<org.springframework.ai.document.Document> filename
 ) {
 }
