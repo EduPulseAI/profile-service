@@ -15,7 +15,7 @@ spring:
   ai:
     vectorstore:
       pgvector:
-        initialize-schema: true
+        dimensions: 768
     vertex.ai:
       gemini:
         chat:

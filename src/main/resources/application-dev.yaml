@@ -1,7 +1,11 @@
 spring:
+  ai:
+    vectorstore:
+      pgvector:
+        initialize-schema: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     defer-datasource-initialization: true
   sql:
     init:

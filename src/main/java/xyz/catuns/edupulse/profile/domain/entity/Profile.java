@@ -47,4 +47,23 @@ public class Profile {
     // Technical skills
     @Embedded
     private TechnicalSkills technicalSkills;
+
+    @PrePersist
+    public void prePersist() {
+        if (personal == null) {
+            personal = new Personal();
+        }
+
+        if (about == null) {
+            about = new About();
+        }
+
+        if (credentials == null) {
+            credentials = new Credentials();
+        }
+
+        if (technicalSkills == null) {
+            technicalSkills = new TechnicalSkills();
+        }
+    }
 }

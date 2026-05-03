@@ -1,8 +1,7 @@
 package xyz.catuns.edupulse.profile.service.impl;
 
-import java.util.List;
-
-import org.springframework.ai.chat.client.ChatClient;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
@@ -10,26 +9,26 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import xyz.catuns.edupulse.profile.domain.dto.UploadResumeResponse;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
+import xyz.catuns.edupulse.profile.domain.entity.Profile;
 import xyz.catuns.edupulse.profile.domain.entity.Resume;
 import xyz.catuns.edupulse.profile.domain.mapper.ProfileMapper;
 import xyz.catuns.edupulse.profile.domain.repository.ProfileRepository;
 import xyz.catuns.edupulse.profile.domain.repository.ResumeRepository;
 import xyz.catuns.edupulse.profile.service.ResumeService;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ResumeServiceImpl implements ResumeService {
 
-    private final ChatClient chatClient;
     private final VectorStore vectorStore;
     private final ProfileMapper profileMapper;
     private final ProfileRepository profileRepository;
@@ -61,9 +60,12 @@ public class ResumeServiceImpl implements ResumeService {
     @Override
     @Transactional
     public UploadResumeResponse uploadResume(MultipartFile file, String username) {
+        Profile profile = profileRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("no user " + username));
+
         // generate unique id
         Resume resume = Resume.builder()
-                .username(username)
+                .profile(profile)
                 .originalFileName(file.getOriginalFilename())
                 .build();
         resume = resumeRepository.save(resume);
@@ -81,6 +83,6 @@ public class ResumeServiceImpl implements ResumeService {
 
         vectorStore.accept(textSplitter.apply(documents));
         log.info("Uploaded docs {}", documents);
-        return new UploadResumeResponse(resume, documents);
+        return new UploadResumeResponse(resume.getId(), documents);
     }
 }

@@ -1,7 +1,12 @@
 package xyz.catuns.edupulse.profile.domain.dto;
 
+import org.springframework.ai.document.Document;
+
+import java.util.List;
+import java.util.UUID;
+
 public record UploadResumeResponse(
-        xyz.catuns.edupulse.profile.domain.entity.Resume username,
-        java.util.List<org.springframework.ai.document.Document> filename
+        UUID resumeId,
+        List<Document> documents
 ) {
 }
