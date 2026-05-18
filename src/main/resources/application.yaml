@@ -1,3 +1,11 @@
+app:
+  kafka:
+    topics:
+      resume-upload: resume.uploads
+  open-api:
+    description: @project.description@
+    title: @project.name@
+    version: @project.version@
 spring:
   application:
     name: profile-service
@@ -5,6 +13,24 @@ spring:
     password: ${DATABASE_PASSWORD:password}
     url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:profile_service}
     username: ${DATABASE_USER:default}
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username='${KAFKA_API_KEY:}' password='${KAFKA_API_SECRET:}';
+      basic.auth.credentials.source: USER_INFO
+      schema.registry.basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:9090}
+    producer:
+      retries: 10
+      acks: all
+      properties:
+        delivery.timeout.ms: 60000
+        request.timeout.ms: 30000
+        linger.ms: 0
+        max.in.flight.requests.per.connection: 5
+        enable.idempotence: true
   profiles:
     active: dev
   jpa:
@@ -41,11 +67,6 @@ eureka:
       defaultZone: ${EUREKA_PROTOCOL:http}://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
     fetch-registry: true
     register-with-eureka: true
-app:
-  open-api:
-    description: @project.description@
-    title: @project.name@
-    version: @project.version@
 management:
   endpoints:
     web:

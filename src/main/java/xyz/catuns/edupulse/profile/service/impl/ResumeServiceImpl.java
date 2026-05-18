@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import xyz.catuns.edupulse.common.messaging.events.resume.ResumeStatus;
+import xyz.catuns.edupulse.common.messaging.events.resume.ResumeUpload;
 import xyz.catuns.edupulse.profile.domain.dto.UploadResumeResponse;
 import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
 import xyz.catuns.edupulse.profile.domain.entity.Profile;
@@ -20,9 +22,12 @@ import xyz.catuns.edupulse.profile.domain.entity.Resume;
 import xyz.catuns.edupulse.profile.domain.mapper.ProfileMapper;
 import xyz.catuns.edupulse.profile.domain.repository.ProfileRepository;
 import xyz.catuns.edupulse.profile.domain.repository.ResumeRepository;
+import xyz.catuns.edupulse.profile.messaging.producer.ResumeUploadProducer;
 import xyz.catuns.edupulse.profile.service.ResumeService;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,7 @@ public class ResumeServiceImpl implements ResumeService {
     private final ProfileMapper profileMapper;
     private final ProfileRepository profileRepository;
     private final ResumeRepository resumeRepository;
+    private final ResumeUploadProducer resumeUploadProducer;
 
     @Value("classpath:prompts/resume.st")
     private Resource resumePromptResource;
@@ -82,7 +88,15 @@ public class ResumeServiceImpl implements ResumeService {
         }
 
         vectorStore.accept(textSplitter.apply(documents));
-        log.info("Uploaded docs {}", documents);
+
+        resumeUploadProducer.publish(ResumeUpload.newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setStatus(ResumeStatus.UPLOADED)
+                .setUserId(username)
+                .setResumeId(resume.getId().toString())
+                .setTimestamp(Instant.now())
+                .build());
+
         return new UploadResumeResponse(resume.getId(), documents);
     }
 }
