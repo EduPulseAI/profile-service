@@ -1,5 +1,6 @@
 package xyz.catuns.edupulse.profile.service;
 
+import xyz.catuns.edupulse.profile.domain.dto.ParsedResumeDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.AboutDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.EducationDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.EducationRequest;
@@ -11,6 +12,8 @@ import xyz.catuns.edupulse.profile.domain.dto.profile.UpdateAboutRequest;
 import xyz.catuns.edupulse.profile.domain.dto.profile.UpdatePersonalRequest;
 
 public interface ProfileService {
+
+    void populateFromResume(String userId, ParsedResumeDto parsedResume);
 
     ProfileResponse getProfileForCurrentUser(String username);
 

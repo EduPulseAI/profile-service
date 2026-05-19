@@ -114,6 +114,6 @@ public class ResumeServiceImpl implements ResumeService {
                 .setTimestamp(Instant.now())
                 .build());
 
-        return new UploadResumeResponse(resume.getId(), documents);
+        return new UploadResumeResponse(resume.getId());
     }
 }
