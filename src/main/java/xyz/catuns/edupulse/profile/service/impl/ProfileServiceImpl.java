@@ -13,7 +13,10 @@ import xyz.catuns.edupulse.profile.service.ProfileService;
 import xyz.catuns.spring.base.exception.controller.BadRequestException;
 import xyz.catuns.spring.base.exception.controller.NotFoundException;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -189,8 +192,104 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional
     public void populateFromResume(String userId, ParsedResumeDto parsedResume) {
-        // Implemented in Story 3 — profile population from parsed resume data
-        throw new UnsupportedOperationException("populateFromResume not yet implemented");
+        Profile profile = profileRepository.findByUsername(userId)
+                .orElseGet(() -> {
+                    Profile p = new Profile();
+                    p.setUsername(userId);
+                    return profileRepository.save(p);
+                });
+
+        mergePersonal(profile, parsedResume.personal());
+
+        for (ParsedResumeDto.ExperienceItemDto expDto : parsedResume.experience()) {
+            profile.getExperiences().add(profileMapper.toExperience(expDto));
+        }
+
+        Credentials credentials = profile.getCredentials();
+        if (credentials == null) {
+            credentials = new Credentials();
+            profile.setCredentials(credentials);
+        }
+
+        for (ParsedResumeDto.EducationDto eduDto : parsedResume.education()) {
+            credentials.getEducation().add(profileMapper.toEducation(eduDto));
+        }
+
+        List<Certification> existingCerts = credentials.getCertifications();
+        for (ParsedResumeDto.CertificationDto certDto : parsedResume.certifications()) {
+            boolean duplicate = existingCerts.stream()
+                    .anyMatch(c -> Objects.equals(c.getName(), certDto.name())
+                               && Objects.equals(c.getIssuer(), certDto.issuer()));
+            if (!duplicate) {
+                existingCerts.add(profileMapper.toCertification(certDto));
+            }
+        }
+
+        if (parsedResume.technicalSkills() != null) {
+            mergeTechnicalSkills(profile, parsedResume.technicalSkills());
+        }
+
+        for (ParsedResumeDto.LanguageDto langDto : parsedResume.languages()) {
+            profile.getLanguages().add(profileMapper.toLanguage(langDto));
+        }
+
+        mergeSocialLink(profile, parsedResume.socialLinks());
+
+        profileRepository.save(profile);
+    }
+
+    private void mergePersonal(Profile profile, ParsedResumeDto.PersonalDto parsed) {
+        if (parsed == null) return;
+        Personal personal = profile.getPersonal();
+        if (personal == null) {
+            personal = new Personal();
+            profile.setPersonal(personal);
+        }
+        if (isBlank(personal.getFirstName()) && !isBlank(parsed.firstName())) personal.setFirstName(parsed.firstName());
+        if (isBlank(personal.getLastName()) && !isBlank(parsed.lastName())) personal.setLastName(parsed.lastName());
+        if (isBlank(personal.getTitle()) && !isBlank(parsed.title())) personal.setTitle(parsed.title());
+        if (isBlank(personal.getLocation()) && !isBlank(parsed.location())) personal.setLocation(parsed.location());
+        if (isBlank(personal.getEmail()) && !isBlank(parsed.email())) personal.setEmail(parsed.email());
+        if (isBlank(personal.getPhone()) && !isBlank(parsed.phone())) personal.setPhone(parsed.phone());
+    }
+
+    private void mergeTechnicalSkills(Profile profile, ParsedResumeDto.TechnicalSkillsDto parsed) {
+        TechnicalSkills skills = profile.getTechnicalSkills();
+        if (skills == null) {
+            skills = new TechnicalSkills();
+            profile.setTechnicalSkills(skills);
+        }
+        skills.setLanguages(mergeStringList(skills.getLanguages(), parsed.languages()));
+        skills.setBackend(mergeStringList(skills.getBackend(), parsed.backend()));
+        skills.setFrontend(mergeStringList(skills.getFrontend(), parsed.frontend()));
+        skills.setDatabase(mergeStringList(skills.getDatabase(), parsed.database()));
+        skills.setCloud(mergeStringList(skills.getCloud(), parsed.cloud()));
+        skills.setTools(mergeStringList(skills.getTools(), parsed.tools()));
+        skills.setMethodologies(mergeStringList(skills.getMethodologies(), parsed.methodologies()));
+    }
+
+    private void mergeSocialLink(Profile profile, ParsedResumeDto.SocialLinkDto parsed) {
+        if (parsed == null) return;
+        SocialLink socialLink = profile.getSocialLink();
+        if (socialLink == null) {
+            socialLink = new SocialLink();
+            profile.setSocialLink(socialLink);
+        }
+        if (isBlank(socialLink.getGithub()) && !isBlank(parsed.github())) socialLink.setGithub(parsed.github());
+        if (isBlank(socialLink.getLinkedin()) && !isBlank(parsed.linkedin())) socialLink.setLinkedin(parsed.linkedin());
+        if (isBlank(socialLink.getDiscord()) && !isBlank(parsed.discord())) socialLink.setDiscord(parsed.discord());
+        if (isBlank(socialLink.getTwitter()) && !isBlank(parsed.twitter())) socialLink.setTwitter(parsed.twitter());
+        if (isBlank(socialLink.getInstagram()) && !isBlank(parsed.instagram())) socialLink.setInstagram(parsed.instagram());
+    }
+
+    private static List<String> mergeStringList(List<String> current, List<String> parsed) {
+        LinkedHashSet<String> merged = new LinkedHashSet<>(current != null ? current : List.of());
+        if (parsed != null) merged.addAll(parsed);
+        return new ArrayList<>(merged);
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isBlank();
     }
 
     // Helper methods
