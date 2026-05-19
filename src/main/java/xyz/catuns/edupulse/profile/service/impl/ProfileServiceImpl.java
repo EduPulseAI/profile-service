@@ -3,6 +3,7 @@ package xyz.catuns.edupulse.profile.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.catuns.edupulse.profile.domain.dto.ParsedResumeDto;
 import xyz.catuns.edupulse.profile.domain.dto.profile.*;
 import xyz.catuns.edupulse.profile.domain.entity.Profile;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.*;
@@ -183,6 +184,13 @@ public class ProfileServiceImpl implements ProfileService {
 
         profileRepository.save(profile);
 
+    }
+
+    @Override
+    @Transactional
+    public void populateFromResume(String userId, ParsedResumeDto parsedResume) {
+        // Implemented in Story 3 — profile population from parsed resume data
+        throw new UnsupportedOperationException("populateFromResume not yet implemented");
     }
 
     // Helper methods

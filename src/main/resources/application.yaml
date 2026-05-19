@@ -17,6 +17,12 @@ spring:
     bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
     properties:
       schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:9090}
+    consumer:
+      group-id: profile-service-resume-consumer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        specific.avro.reader: true
     producer:
       retries: 10
       acks: all
