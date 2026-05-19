@@ -11,7 +11,7 @@
 
 	<groupId>xyz.catuns.edupulse</groupId>
 	<artifactId>profile-service</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>Edupulse - Profile</name>
 	<description>Manage user profiles and resumes</description>
 
