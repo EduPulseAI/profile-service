@@ -48,6 +48,16 @@ public class Profile {
     @Embedded
     private TechnicalSkills technicalSkills;
 
+    // Social links
+    @Embedded
+    private SocialLink socialLink;
+
+    // Spoken languages
+    @ElementCollection
+    @CollectionTable(name = "profile_spoken_languages", joinColumns = @JoinColumn(name = "profile_id"))
+    @OrderColumn(name = "language_order")
+    private List<Language> languages = new ArrayList<>();
+
     @PrePersist
     public void prePersist() {
         if (personal == null) {
@@ -64,6 +74,10 @@ public class Profile {
 
         if (technicalSkills == null) {
             technicalSkills = new TechnicalSkills();
+        }
+
+        if (socialLink == null) {
+            socialLink = new SocialLink();
         }
     }
 }

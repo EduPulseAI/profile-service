@@ -16,11 +16,6 @@ spring:
   kafka:
     bootstrap-servers: ${BOOTSTRAP_SERVERS:localhost:9092}
     properties:
-      security.protocol: SASL_SSL
-      sasl.mechanism: PLAIN
-      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username='${KAFKA_API_KEY:}' password='${KAFKA_API_SECRET:}';
-      basic.auth.credentials.source: USER_INFO
-      schema.registry.basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
       schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:9090}
     producer:
       retries: 10
@@ -33,6 +28,8 @@ spring:
         enable.idempotence: true
   profiles:
     active: dev
+  flyway:
+    enabled: false
   jpa:
     properties:
       hibernate:
@@ -87,3 +84,19 @@ jwt:
   issuer: ${spring.application.name}
   security:
     public-paths: /swagger-ui/**, /v3/api-docs/**, /actuator/health/**, /error/**
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: confluence
+  kafka:
+    properties:
+      # KAFKA security
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username='${KAFKA_API_KEY:}' password='${KAFKA_API_SECRET:}';
+      basic.auth.credentials.source: USER_INFO
+      # schema registry api key
+      schema.registry.basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}

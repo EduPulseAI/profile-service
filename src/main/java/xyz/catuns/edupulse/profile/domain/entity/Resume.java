@@ -32,4 +32,7 @@ public class Resume {
     @Column(name = "original_file_name")
     private String originalFileName;
 
+    @Column(name = "raw_text", columnDefinition = "TEXT")
+    private String rawText;
+
 }

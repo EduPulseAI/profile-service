@@ -9,6 +9,7 @@ import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvi
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xyz.catuns.edupulse.profile.advisor.TokenUsageAuditAdvisor;
@@ -28,6 +29,14 @@ public class VertexAiConfig {
                 .build();
         return ChatClient.builder(chatModel)
                 .defaultAdvisors(List.of(memoryAdvisor, loggerAdvisor, tokenUsageAdvisor, questionAnswerAdvisor))
+                .build();
+    }
+
+    @Bean
+    @Qualifier("parsingChatClient")
+    public ChatClient parsingChatClient(VertexAiGeminiChatModel chatModel) {
+        return ChatClient.builder(chatModel)
+                .defaultAdvisors(List.of(new TokenUsageAuditAdvisor(), new SimpleLoggerAdvisor()))
                 .build();
     }
 }
