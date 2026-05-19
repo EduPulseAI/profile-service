@@ -1,20 +1,8 @@
 package xyz.catuns.edupulse.profile.domain.mapper;
 
 import org.mapstruct.*;
-import xyz.catuns.edupulse.profile.domain.dto.profile.AboutDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.CertificationDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.CredentialsDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.EducationDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.EducationRequest;
-import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceItemDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.ExperienceRequest;
-import xyz.catuns.edupulse.profile.domain.dto.profile.LanguageDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.PersonalDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.ProfileResponse;
-import xyz.catuns.edupulse.profile.domain.dto.profile.SocialLinkDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.TechnicalSkillsDto;
-import xyz.catuns.edupulse.profile.domain.dto.profile.UpdateAboutRequest;
-import xyz.catuns.edupulse.profile.domain.dto.profile.UpdatePersonalRequest;
+import xyz.catuns.edupulse.profile.domain.dto.ParsedResumeDto;
+import xyz.catuns.edupulse.profile.domain.dto.profile.*;
 import xyz.catuns.edupulse.profile.domain.entity.Profile;
 import xyz.catuns.edupulse.profile.domain.entity.embeddable.*;
 
@@ -71,4 +59,20 @@ public interface ProfileMapper {
     void updateEducationFromRequest(EducationRequest request, @MappingTarget Education education);
 
     Profile toEntity(ProfileResponse resume);
+
+    // ParsedResumeDto → entity mapping (used by profile population)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Experience toExperience(ParsedResumeDto.ExperienceItemDto dto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Education toEducation(ParsedResumeDto.EducationDto dto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Certification toCertification(ParsedResumeDto.CertificationDto dto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Language toLanguage(ParsedResumeDto.LanguageDto dto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    SocialLink toSocialLink(ParsedResumeDto.SocialLinkDto dto);
 }
